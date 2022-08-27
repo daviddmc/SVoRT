@@ -1,0 +1,19 @@
+dataset: !include ./dataset.yaml
+
+scanner: !include ./scan.yaml
+
+model:
+  model_type: SVoRT
+  model_param:
+    n_iter: 3
+    iqa: True
+    vol: True
+    pe: True
+  device: 1
+  n_train: 200000
+  batch_size: 8
+  lr: 0.0002
+  weight_decay: 0.0001
+  warmup_steps: 500
+  weight_point: 0.1
+  weight_img: 100.0

@@ -1,0 +1,13 @@
+resolution_slice_fac: 1.25
+resolution_slice_max: 1.5
+slice_thickness: [2.5, 3.5]
+resolution_recon: 0.8
+min_num_stack: 3
+max_num_stack: 3
+noise_sigma: [0, 0.03]
+TR: [1, 2]
+prob_void:  0.03
+prob_motion: 0.00
+slice_size: 128
+restrict_transform: False
+txy: 3

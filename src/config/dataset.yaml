@@ -1,0 +1,8 @@
+device: 0
+data_dir: '../dataset/registered'
+test_set: [1, 6, 10, 24, 30, 36, 43, 44, 50, 53, 62, 73]
+bias_size: [3, 5]
+bias_sigma: [0, 0.1]
+gamma: [0.8, 1.2]
+quantile: 0.99
+

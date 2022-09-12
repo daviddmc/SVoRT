@@ -22,6 +22,10 @@ SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI
 - [ ] pretrained weights
 - [ ] inference
 
+## Training data
+
+To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```.
+
 ## Citation
 
 ```

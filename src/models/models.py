@@ -20,13 +20,13 @@ class SVoRT(nn.Module):
             svrnet_list.append(
                 SVRtransformer(
                   n_res=50, 
-                  n_layers=4, n_head=4*2, d_in=9+2, d_out=9, d_model=256*2, d_inner=512*2, dropout=0.1, 
+                  n_layers=4, n_head=4*2, d_in=9+2, d_out=9, d_model=256*2, d_inner=512*2, dropout=0.0, 
                   res_d_in=4 if (i > 0 and self.vol) else 3
                   )
             )
         self.svrnet = nn.ModuleList(svrnet_list)
         if iqa:
-            self.srrnet = SRRtransformer(n_res=34, n_layers=4, n_head=4, d_in=8, d_out=1, d_model=256, d_inner=512, dropout=0.1)
+            self.srrnet = SRRtransformer(n_res=34, n_layers=4, n_head=4, d_in=8, d_out=1, d_model=256, d_inner=512, dropout=0.0)
 
     def forward(self, data):
 

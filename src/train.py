@@ -151,15 +151,25 @@ if __name__ == '__main__':
 
         (loss / cfg['model']['batch_size']).backward()
         # stats
-        average('rot', loss_R[-1].item())
-        average('tran', loss_T[-1].item())
-        average('img', loss_img[-1].item())
-        average('point', loss_p[-1].item())
+        if np.isfinite([loss_R[-1].item(), loss_T[-1].item(), loss_img[-1].item(), loss_p[-1].item()]).all():
+            average('rot', loss_R[-1].item())
+            average('tran', loss_T[-1].item())
+            average('img', loss_img[-1].item())
+            average('point', loss_p[-1].item())
+        else:
+            print('warning: loss is nan or inf')
+            print([loss_R[-1].item(), loss_T[-1].item(), loss_img[-1].item(), loss_p[-1].item()])
         # optimizer step
         if (i+1) % cfg['model']['batch_size'] == 0:
-            optimizer.step()
+            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 500.0).item()
+            if np.isfinite(grad_norm):
+                #print(grad_norm)
+                optimizer.step()
+                scheduler.step()
+            else:
+                print('warning: grad norm is nan or inf')
+                print(grad_norm)
             optimizer.zero_grad()
-            scheduler.step()
         # print out
         if (i+1) % 100 == 0:
             volume_gt = data['volume_gt']

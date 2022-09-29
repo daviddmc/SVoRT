@@ -33,7 +33,7 @@ def save_stack(slices, transforms, res_s, s_thick, scale, dtype, fname):
     img.header.set_sform(affine, code='scanner')
     nib.save(img, fname)
     return fname    
-
+    
 def load_stack(f, device):
     img = nib.load(f)
     slices = img.get_fdata().astype(np.float32).transpose(2, 1, 0)
@@ -41,11 +41,18 @@ def load_stack(f, device):
     slices = torch.tensor(slices, device=device).unsqueeze(1)
     res = img.header['pixdim'][1:4]
     affine = img.affine
+    if np.any(np.isnan(affine)):
+        affine = img.get_qform()
+    
     R = affine[:3,:3]
-    T = affine[:3,-1:] # T = R @ (-T0 + T_r)
+    if np.linalg.det(R) < 0:
+        print('warning: det(R) < 0')
+    T = affine[:3,-1:]
     R = R @ np.linalg.inv(np.diag(res))
+    
     T0 = np.array([(w-1)/2 * res[0], (h-1)/2 * res[1], 0])
     T = np.linalg.inv(R) @ T + T0.reshape(3, 1)
+    
     tz = torch.arange(0, d, device=device, dtype=torch.float32) * res[2] + T[2].item()
     tx = torch.ones_like(tz) * T[0].item()
     ty = torch.ones_like(tz) * T[1].item()

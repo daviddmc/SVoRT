@@ -15,16 +15,27 @@ SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI
 - scipy
 - nibabel
 
-## Todo
+## Training from scratch
 
-- [x] model
-- [x] training
-- [ ] pretrained weights
-- [ ] inference
-
-## Training data
+### Generate training data
 
 To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```.
+
+### Modify hyperparameters
+
+The hyperparameters of data simulation and model are stored in ```./src/config/```.
+
+### Run the training script
+
+```python train.py SVoRT```
+
+## Pretrained model
+
+To use the pretrained model, please first download the [pretrain weights](https://zenodo.org/record/7121298#.YzS4R3bML-g).
+
+## Testing
+
+```python test.py SVoRT <path-to-model-checkpoint> <path-to-output-folder>```
 
 ## Citation
 

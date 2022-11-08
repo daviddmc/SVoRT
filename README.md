@@ -4,6 +4,7 @@ SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI
 ## Resources
 
 - [paper (arxiv)](https://arxiv.org/pdf/2206.10802.pdf)
+- Check out [NeSVoR](https://github.com/daviddmc/NeSVoR) for an application of SVoRT
 
 ## Requirements
 

@@ -2,6 +2,8 @@
 !/dataset/preprocessing.py
 !/dataset/traj.npy
 /results/*
+.vscode/
+.mypy_cache/
 
 
 # Byte-compiled / optimized / DLL files

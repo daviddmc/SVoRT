@@ -1,13 +1,28 @@
+# slice_resolution = resolution_slice_fac * volume_resolution
 resolution_slice_fac: 1.25
+# maximum of slice resolution (mm)
 resolution_slice_max: 1.5
+# [min, max] of slice thickness (mm)
 slice_thickness: [2.5, 3.5]
+# [min, max] of slice gap (mm)
+gap: [2.5, 3.5]
+# resolution in volume esitmation (mm)
 resolution_recon: 0.8
 min_num_stack: 3
 max_num_stack: 3
+# maximum number of input slices
+max_num_slices: 450
+# range of image noise
 noise_sigma: [0, 0.03]
+# time repetition (s)
 TR: [1, 2]
+# probability of adding signal void
 prob_void:  0.03
+# probability of adding motion artifact (TODO)
 prob_motion: 0.00
+# size of simulated slices (pixel)
 slice_size: 128
+# restrict_transform = True means only sample rotation within a hemisphere, otherwise sample rotation from the entire shpere.
 restrict_transform: False
+# max random inplane translation (mm)
 txy: 3

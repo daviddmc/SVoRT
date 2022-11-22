@@ -5,31 +5,30 @@ from config import get_config
 import torch
 from models import SVoRT
 from data.scan import Scanner
-from data.dataset import RegisteredFetaDataset
+from data.dataset import CombinedDataset
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     assert len(sys.argv) == 4
     # parameters
     name = sys.argv[1]
     path_cp = sys.argv[2]
     path_out = sys.argv[3]
-    
-    cfg = get_config('config_' + name)
+
+    cfg = get_config("config_" + name)
     # mkdir
     os.makedirs(path_out, exist_ok=True)
     # model
-    device = torch.device(cfg['model']['device'])
-    model = globals()[cfg['model']['model_type']](**cfg['model']['model_param'])
-    cp = os.path.join(path_cp)
-    cp = torch.load(cp)
+    device = torch.device(cfg["model"]["device"])
+    model = globals()[cfg["model"]["model_type"]](**cfg["model"]["model_param"])
+    cp = torch.load(path_cp)
     model.to(device)
-    model.load_state_dict(cp['model'])
+    model.load_state_dict(cp["model"])
     model.eval()
-    
+
     # test dataset
-    dataset = RegisteredFetaDataset(True, cfg['dataset'])
-    scanner = Scanner(cfg['scanner'])
+    dataset = CombinedDataset(True, cfg["dataset"])
+    scanner = Scanner(cfg["scanner"])
 
     for i in range(len(dataset)):
         # read data
@@ -46,7 +45,13 @@ if __name__ == '__main__':
         points = {}
         with torch.no_grad():
             transforms, volumes, points = model(data)
-                
+
         # save transform
-        np.save(os.path.join(path_save, 'transforms.npy'), transforms[-1].matrix().detach().cpu().numpy())
-        np.save(os.path.join(path_save, 'transforms_gt.npy'), data['transforms_gt'].detach().cpu().numpy())
+        np.save(
+            os.path.join(path_save, "transforms.npy"),
+            transforms[-1].matrix().detach().cpu().numpy(),
+        )
+        np.save(
+            os.path.join(path_save, "transforms_gt.npy"),
+            data["transforms_gt"].detach().cpu().numpy(),
+        )

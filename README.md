@@ -1,5 +1,6 @@
-# SVoRT
-SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI
+# Slice-to-Volume Registration Transformer (SVoRT)
+
+This repo is the official implementation of the paper 'SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI'
 
 ## Resources
 

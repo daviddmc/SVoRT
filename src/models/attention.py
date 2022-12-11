@@ -72,7 +72,7 @@ class MultiHeadAttention(nn.Module):
         q = self.dropout(q)
         q = q + residual
 
-        if not self.prenorm:
+        if not self.prenorm: # post norm
             q = self.layer_norm(q)
 
         q = q.squeeze(0)
@@ -127,7 +127,7 @@ class PositionwiseFeedForward(nn.Module):
         x = self.w_2(self.activation(self.w_1(x)))
         x = self.dropout(x)
         x = x + residual
-        if not self.prenorm:
+        if not self.prenorm: # post norm
             x = self.layer_norm(x)
         return x
 
@@ -149,7 +149,7 @@ class EncoderLayer(nn.Module):
     ):
         super(EncoderLayer, self).__init__()
         self.slf_attn = MultiHeadAttention(
-            n_head, d_model, d_k, d_v, dropout, activation_attn, activation_ff, prenorm
+            n_head, d_model, d_k, d_v, dropout, activation_attn, prenorm
         )
         self.pos_ffn = PositionwiseFeedForward(
             d_model, d_inner, dropout, activation_ff, prenorm
@@ -221,7 +221,7 @@ class TransformerEncoder(nn.Module):
     def forward(self, x, pos_enc, mask=None):
 
         enc_output = self.dropout(x + pos_enc)
-        if not self.prenorm:
+        if not self.prenorm: # post-norm
             enc_output = self.layer_norm(enc_output)
 
         for enc_layer in self.layer_stack:

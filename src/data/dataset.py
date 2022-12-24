@@ -44,6 +44,7 @@ class CombinedDataset:
         for key in cfg:
             if key in globals():
                 self.datasets.append(globals()[key](is_test, cfg))
+        self.idx = 0
 
     def __len__(self):
         return sum(len(dataset) for dataset in self.datasets)
@@ -98,10 +99,12 @@ class AugmentationDataset:
 
         volume = nib.load(f).get_fdata()
         volume = torch.from_numpy(volume[None, None, 10:-10, 20:-20, 15:-15])
+        volume = torch.flip(volume.permute(0, 1, 4, 3, 2), (-1, -2))
         volume = volume.contiguous().to(dtype=torch.float32, device=self.device)
         if m is not None:
             seg = nib.load(m).get_fdata()
             seg = torch.from_numpy(seg[None, None, 10:-10, 20:-20, 15:-15])
+            seg = torch.flip(seg.permute(0, 1, 4, 3, 2), (-1, -2))
             seg = seg.contiguous().to(device=self.device)
             mask = (seg > 0).float()
             if np.random.rand() > 0.7:

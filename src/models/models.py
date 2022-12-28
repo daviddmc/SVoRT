@@ -226,7 +226,8 @@ class SVoRTv2(nn.Module):
             _trans = RigidTransform(point2mat(theta))
 
             with torch.no_grad():
-                if i == 0 or i == iter_grad:  # adjust for GT
+                if (i == 0 or i == iter_grad) and "transforms_gt" in data:
+                    # adjust for GT
                     diff = (
                         RigidTransform(data["transforms_gt"])
                         .compose(_trans.inv())

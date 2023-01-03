@@ -21,7 +21,7 @@ This repo is the official implementation of the paper 'SVoRT: Iterative Transfor
 
 ### Generate training data
 
-To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```. You may also add your own training data (see `RegisteredDataset` in `data/dataset.py`).
+To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```. You may also add your own training data (see `RegisteredDataset` in `.src/data/dataset.py`).
 
 ### Modify hyperparameters
 
@@ -29,15 +29,22 @@ The hyperparameters of data simulation and model are stored in ```./src/config/`
 
 ### Run the training script
 
-```python train.py --config ./config/config_SVoRTv2.yaml --output ../results/SVoRTv2```
+```
+python train.py --config ./config/config_SVoRTv2.yaml \
+                --output ../results/SVoRTv2
+```
 
 ## Pretrained model
 
-To use the pretrained model, please first download the [pretrain weights](https://zenodo.org/record/7121298#.YzS4R3bML-g).
+To use the pretrained model, please first download the [pretrain weights](https://zenodo.org/record/7486938#.Y7Sgn3bMI2w).
 
 ## Testing
 
-```python test.py --config ./config/config_SVoRTv2.yaml --output ../results/SVoRTv2/test_output --checkpoint ../results/SVoRTv2/checkpoint.pt```
+```
+python test.py --config ./config/config_SVoRTv2.yaml \
+               --output ../results/SVoRTv2/test_output \
+               --checkpoint ../results/SVoRTv2/checkpoint.pt
+```
 
 ## Citation
 

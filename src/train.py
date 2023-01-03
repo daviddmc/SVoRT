@@ -1,5 +1,4 @@
 import os
-import sys
 from config import get_config
 import torch
 import torch.nn.functional as F

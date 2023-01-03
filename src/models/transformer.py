@@ -5,7 +5,8 @@ from transform import mat_update_resolution, point2mat
 from .attention import TransformerEncoder, PositionalEncoding, ResNet
 from slice_acquisition import slice_acquisition
 from .reconstruction import SRR
-from .vit import ViT
+
+# from .vit import SimpleViT
 
 
 class SRRtransformer(nn.Module):
@@ -36,7 +37,6 @@ class SRRtransformer(nn.Module):
             dropout=dropout,
         )
         self.fc = nn.Linear(d_model, d_out)
-        # self.fc_s = nn.Linear(d_model*2,d_model)
 
     def forward(
         self, theta, transforms, slices, volume, params, idx, attn_mask, feat_stack=None

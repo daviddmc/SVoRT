@@ -21,7 +21,7 @@ This repo is the official implementation of the paper 'SVoRT: Iterative Transfor
 
 ### Generate training data
 
-To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```.
+To generate training data, please download the [CRL atlas](http://crl.med.harvard.edu/research/fetal_brain_atlas/) and [FeTA dataset v2.1](http://neuroimaging.ch/feta), unzip them in ```dataset/```, and run ```preprocessing.py```. You may also add your own training data (see `RegisteredDataset` in `data/dataset.py`).
 
 ### Modify hyperparameters
 
@@ -29,7 +29,7 @@ The hyperparameters of data simulation and model are stored in ```./src/config/`
 
 ### Run the training script
 
-```python train.py SVoRT```
+```python train.py --config ./config/config_SVoRTv2.yaml --output ../results/SVoRTv2```
 
 ## Pretrained model
 
@@ -37,16 +37,18 @@ To use the pretrained model, please first download the [pretrain weights](https:
 
 ## Testing
 
-```python test.py SVoRT <path-to-model-checkpoint> <path-to-output-folder>```
+```python test.py --config ./config/config_SVoRTv2.yaml --output ../results/SVoRTv2/test_output --checkpoint ../results/SVoRTv2/checkpoint.pt```
 
 ## Citation
 
 ```
-@article{xu2022svort,
+@inproceedings{xu2022svort,
   title={SVoRT: Iterative Transformer for Slice-to-Volume Registration in Fetal Brain MRI},
   author={Xu, Junshen and Moyer, Daniel and Grant, P Ellen and Golland, Polina and Iglesias, Juan Eugenio and Adalsteinsson, Elfar},
-  journal={arXiv preprint arXiv:2206.10802},
-  year={2022}
+  booktitle={International Conference on Medical Image Computing and Computer-Assisted Intervention},
+  pages={3--13},
+  year={2022},
+  organization={Springer}
 }
 ```
 

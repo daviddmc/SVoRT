@@ -1,8 +1,8 @@
-import yaml 
+import yaml
 import os
 
-class Loader(yaml.SafeLoader):
 
+class Loader(yaml.SafeLoader):
     def __init__(self, stream):
 
         self._root = os.path.split(stream.name)[0]
@@ -13,13 +13,14 @@ class Loader(yaml.SafeLoader):
 
         filename = os.path.join(self._root, self.construct_scalar(node))
 
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             return yaml.load(f, Loader)
 
-Loader.add_constructor('!include', Loader.include)
 
-def get_config(name):
-    dirname = os.path.dirname(__file__)
-    with open(os.path.join(dirname, name + ".yaml"), 'r') as stream:
+Loader.add_constructor("!include", Loader.include)
+
+
+def get_config(f):
+    with open(f, "r") as stream:
         cfg = yaml.load(stream, Loader=Loader)
     return cfg

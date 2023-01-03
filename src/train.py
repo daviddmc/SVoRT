@@ -6,7 +6,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.multiprocessing as mp
 import numpy as np
-from models import SVoRT
+import argparse
+from models import *
 from data.io import save_volume
 from data.scan import Scanner
 from data.dataset import CombinedDataset
@@ -132,17 +133,23 @@ def point_loss(ps, transforms_gt, sx, sy, rs):
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 2
     # parameters
-    name = sys.argv[1]
-    cfg = get_config("config_" + name)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--config", help="path to the yaml config file", required=True, type=str
+    )
+    parser.add_argument("--output", help="output folder", required=True, type=str)
+    args = parser.parse_args()
+
+    cfg = get_config(args.config)
     # mkdir
-    os.makedirs(os.path.join("../results", name, "outputs"), exist_ok=True)
+    os.makedirs(os.path.join(args.output, "outputs"), exist_ok=True)
     # model and optimizer
     device = torch.device(cfg["model"]["device"])
     model = globals()[cfg["model"]["model_type"]](**cfg["model"]["model_param"]).to(
         device
     )
+    n_train = cfg["model"]["n_train"]
     optimizer = optim.AdamW(
         model.parameters(),
         lr=cfg["model"]["lr"],
@@ -151,40 +158,57 @@ if __name__ == "__main__":
     scheduler = WarmupLinearSchedule(
         optimizer,
         warmup_steps=cfg["model"]["warmup_steps"],
-        t_total=cfg["model"]["n_train"] / cfg["model"]["batch_size"],
+        t_total=n_train / cfg["model"]["batch_size"],
     )
     average = MovingAverage(0.999)
     # read data with multiprocessing
     ctx = mp.get_context("spawn")
-    queue = ctx.Queue(2)
+    queue = ctx.Queue(4)
     p = ctx.Process(target=read_data, args=(cfg["dataset"], cfg["scanner"], queue))
     p.daemon = True
     p.start()
     # main loop
     t_start = time.time()
-    for i in range(cfg["model"]["n_train"]):
+    for i in range(n_train):
         # read data
         data = queue.get()
         for k in data:
             if torch.is_tensor(data[k]):
                 data[k] = data[k].to(device, non_blocking=True)
         # forward and backward
-        transforms, volumes, points = model(data)
-        loss_p = point_loss(
-            points,
-            data["transforms_gt"],
-            data["slice_shape"][0],
-            data["slice_shape"][1],
-            data["resolution_slice"],
-        )
-        loss_R, loss_T = trans_loss(transforms, RigidTransform(data["transforms_gt"]))
-        loss_img = img_loss(volumes, data["volume_gt"])
+        try:
+            transforms, volumes, points = model(data)
+            loss_p = point_loss(
+                points,
+                data["transforms_gt"],
+                data["slice_shape"][0],
+                data["slice_shape"][1],
+                data["resolution_slice"],
+            )
+            loss_R, loss_T = trans_loss(
+                transforms, RigidTransform(data["transforms_gt"])
+            )
+            loss_img = img_loss(volumes, data["volume_gt"])
 
-        loss = cfg["model"].get("weight_point", 0) * sum(loss_p) + cfg["model"].get(
-            "weight_img", 0
-        ) * sum(loss_img)
+            loss = (
+                cfg["model"].get("weight_point", 0) * sum(loss_p)
+                + cfg["model"].get("weight_img", 0) * sum(loss_img)
+                + cfg["model"].get("weight_T", 0) * sum(loss_T)
+                + cfg["model"].get("weight_R", 0) * sum(loss_R)
+            )
 
-        (loss / cfg["model"]["batch_size"]).backward()
+            (loss / cfg["model"]["batch_size"]).backward()
+        except RuntimeError as e:
+            if "out of memory" in str(e):
+                print("OOM")
+                del data, loss, loss_R, loss_T, loss_p, loss_img, transforms, volumes
+                for _p in model.parameters():
+                    if _p.grad is not None:
+                        del _p.grad  # free some memory
+                torch.cuda.empty_cache()
+                continue
+            else:
+                raise
         # stats
         if np.isfinite(
             [
@@ -212,7 +236,6 @@ if __name__ == "__main__":
         if (i + 1) % cfg["model"]["batch_size"] == 0:
             grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 500.0).item()
             if np.isfinite(grad_norm):
-                # print(grad_norm)
                 optimizer.step()
                 scheduler.step()
             else:
@@ -222,14 +245,14 @@ if __name__ == "__main__":
         # print out
         if (i + 1) % 100 == 0:
             volume_gt = data["volume_gt"]
-            fname = os.path.join("../results", name, "outputs")
+            fname = os.path.join(args.output, "outputs")
             save_volume(
                 os.path.join(fname, "gt.nii.gz"), volume_gt, data["resolution_recon"]
             )
             save_volume(
                 os.path.join(fname, "out.nii.gz"), volumes[-1], data["resolution_recon"]
             )
-            fname = os.path.join("../results", name, "loss.csv")
+            fname = os.path.join(args.output, "loss.csv")
             header = "" if os.path.exists(fname) else average.header()
             with open(fname, "ab") as f:
                 np.savetxt(
@@ -249,6 +272,6 @@ if __name__ == "__main__":
         if (i + 1) % 1000 == 0:
             torch.save(
                 {"iter": i, "model": model.state_dict(), "loss": average.to_dict()},
-                os.path.join("../results", name, "checkpoint.pt"),
+                os.path.join(args.output, "checkpoint.pt"),
             )
         i += 1

@@ -1,27 +1,32 @@
 import os
-import sys
+import argparse
 import numpy as np
 from config import get_config
 import torch
-from models import SVoRT
+from models import *
 from data.scan import Scanner
 from data.dataset import CombinedDataset
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 4
     # parameters
-    name = sys.argv[1]
-    path_cp = sys.argv[2]
-    path_out = sys.argv[3]
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--config", help="path to the yaml config file", required=True, type=str
+    )
+    parser.add_argument(
+        "--checkpoint", help="path to the checkpoint file", required=True, type=str
+    )
+    parser.add_argument("--output", help="output folder", required=True, type=str)
+    args = parser.parse_args()
 
-    cfg = get_config("config_" + name)
+    cfg = get_config(args.config)
     # mkdir
-    os.makedirs(path_out, exist_ok=True)
+    os.makedirs(args.output, exist_ok=True)
     # model
     device = torch.device(cfg["model"]["device"])
     model = globals()[cfg["model"]["model_type"]](**cfg["model"]["model_param"])
-    cp = torch.load(path_cp)
+    cp = torch.load(args.checkpoint)
     model.to(device)
     model.load_state_dict(cp["model"])
     model.eval()
@@ -37,7 +42,7 @@ if __name__ == "__main__":
         for k in data:
             if torch.is_tensor(data[k]):
                 data[k] = data[k].to(device, non_blocking=True)
-        path_save = os.path.join(path_out, str(i))
+        path_save = os.path.join(args.output, str(i))
         os.makedirs(path_save, exist_ok=True)
         # run models
         transforms = {}

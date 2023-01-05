@@ -6,8 +6,6 @@ from .attention import TransformerEncoder, PositionalEncoding, ResNet
 from slice_acquisition import slice_acquisition
 from .reconstruction import SRR
 
-# from .vit import SimpleViT
-
 
 class SRRtransformer(nn.Module):
     def __init__(
@@ -186,7 +184,6 @@ class SVRtransformerV2(nn.Module):
         n_channels=2,
     ):
         super().__init__()
-        # self.img_encoder = ViT(channels=n_channels, num_classes=d_model)
         self.img_encoder = ResNet(
             n_res=n_res, d_model=d_model, pretrained=False, d_in=n_channels + 2
         )

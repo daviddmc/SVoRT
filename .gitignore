@@ -1,6 +1,7 @@
 /dataset/*
 !/dataset/preprocessing.py
 !/dataset/traj.npy
+!/dataset/gen_traj.py
 /results/*
 .vscode/
 .mypy_cache/
